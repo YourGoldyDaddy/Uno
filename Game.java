@@ -11,7 +11,7 @@ import javax.swing.JOptionPane;
 
 public class Game {
 	private int currentPlayer;
-	private String[] playerIds;
+	public static ArrayList<String> playerIds;
 	
 	private UnoDeck deck;
 	private ArrayList<ArrayList<UnoCard>> playerHand;
@@ -27,7 +27,10 @@ public class Game {
 		deck.shuffle();
 		stockPile = new ArrayList<UnoCard>();
 		
-		playerIds = pids;
+		for (String pid : playerIds) {
+			playerIds.add(pid);
+		}
+
 		currentPlayer = 0;
 		gameDirection = false;
 		
@@ -52,27 +55,27 @@ public class Game {
 			start(game);
 		}
 		if(card.getValue() == UnoCard.Value.Skip) {
-			JLabel message = new JLabel(playerIds[currentPlayer] + " was skipped!");
+			JLabel message = new JLabel(playerIds.get(currentPlayer) + " was skipped!");
 			message.setFont(new Font("Arial", Font.BOLD,48));
 			JOptionPane.showMessageDialog(null, message);
 			
 			if(gameDirection == false) {
-				currentPlayer =(currentPlayer +1) % playerIds.length;
+				currentPlayer =(currentPlayer +1) % playerIds.size();
 			}	
 				else if(gameDirection == true) {
-					currentPlayer =(currentPlayer -1) % playerIds.length;
+					currentPlayer =(currentPlayer -1) % playerIds.size();
 					if(currentPlayer == -1) {
-						currentPlayer = playerIds.length -1;
+						currentPlayer = playerIds.size() -1;
 					}
 				}	
 			}
 		
 			if (card.getValue() == UnoCard.Value.Reverse) {
-				JLabel message = new JLabel(playerIds[currentPlayer] + " The Game Direction Changed");
+				JLabel message = new JLabel(playerIds.get(currentPlayer) + " The Game Direction Changed");
 				message.setFont(new Font("Arial", Font.BOLD,48));
 				JOptionPane.showMessageDialog(null, message);
 				gameDirection ^= true;
-				currentPlayer = playerIds.length -1;
+				currentPlayer = playerIds.size() -1;
 			}
 			
 			stockPile.add(card);
@@ -86,7 +89,7 @@ public class Game {
 		
 	}
 	public boolean isGameOver() {
-		for(String player : this.playerIds) {
+		for(String player : playerIds) {
 			if(hasEmptyHand(player)) {
 				return true;
 			}
@@ -94,22 +97,21 @@ public class Game {
 		return false;
 	}
 	public String getCurrentPlayer() {
-		return this.playerIds[this.currentPlayer];
+		return playerIds.get(currentPlayer);
 	}
 	
 	public String getPreviousPlayer(int i) {
 		int index = this.currentPlayer -1;
 		if(index == -1) {
-			index = playerIds.length -1;
+			index = playerIds.size() -1;
 		}
-		return this.playerIds[index];
+		return playerIds.get(index);
 	}
-	public String[] getPlayer() {
+	public ArrayList<String> getPlayer() {
 		return playerIds;
 	}
 	public ArrayList<UnoCard> getPlayerHand(String pid){
-		int index = Arrays.asList(playerIds).indexOf(pid);
-		return playerHand.get(index);
+		return playerHand.get(playerIds.indexOf(pid));
 	}
 	public int getPlayerHandSize(String pid) {
 		return getPlayerHand(pid).size();
@@ -128,7 +130,7 @@ public class Game {
 		
 	}
 	public void checkPlayerTurn(String pid) throws InvalidPlayerTurnException {
-		if(this.playerIds[this.currentPlayer] != pid) {
+		if(playerIds.get(currentPlayer) != pid) {
 			throw new InvalidPlayerTurnException("it is not "+ pid + " 's turn", pid );
 		}
 	}
@@ -143,12 +145,12 @@ public class Game {
 		
 		getPlayerHand(pid).add(deck.drawCard());
 		if(gameDirection == false ) {
-			currentPlayer = (currentPlayer +1) % playerIds.length;
+			currentPlayer = (currentPlayer +1) % playerIds.size();
 		}
 		else if(gameDirection == true) {
-			currentPlayer =(currentPlayer -1) % playerIds.length;
+			currentPlayer =(currentPlayer -1) % playerIds.size();
 			if(currentPlayer == -1) {
-				currentPlayer = playerIds.length -1;
+				currentPlayer = playerIds.size() -1;
 			}
 		}
 	}
@@ -186,23 +188,23 @@ public class Game {
 		
 		pHand.remove(card);
 		
-		if(hasEmptyHand(this.playerIds[currentPlayer])) {
-			JLabel message2 = new JLabel(this.playerIds[currentPlayer] + "won the game!");
+		if(hasEmptyHand(playerIds.get(currentPlayer))) {
+			JLabel message2 = new JLabel(playerIds.get(currentPlayer) + "won the game!");
 			message2.setFont(new Font("Arial", Font.BOLD, 48));
 			JOptionPane.showMessageDialog(null,  message2);
-			throw new InvalidValueSubmissionException(this.playerIds[currentPlayer] + "won the game!", card.getValue(), validValue);
+			throw new InvalidValueSubmissionException(playerIds.get(currentPlayer) + "won the game!", card.getValue(), validValue);
 		}
 		validColor = card.getColor();
 		validValue = card.getValue();
 		stockPile.add(card);
 		
 		if(gameDirection == false) {
-			currentPlayer = (currentPlayer +1) % playerIds.length;
+			currentPlayer = (currentPlayer +1) % playerIds.size();
 		}
 		else if(gameDirection == true) {
-			currentPlayer =(currentPlayer -1) % playerIds.length;
+			currentPlayer =(currentPlayer -1) % playerIds.size();
 			if(currentPlayer == -1) {
-				currentPlayer = playerIds.length -1;
+				currentPlayer = playerIds.size() -1;
 			}
 		}
 		if(card.getColor() == UnoCard.Color.Wild){
@@ -211,13 +213,13 @@ public class Game {
 		}
 		
 		if(card.getValue() == UnoCard.Value.DrawTwo){
-			pid = playerIds[currentPlayer];
+			pid = playerIds.get(currentPlayer);
 			getPlayerHand(pid).add(deck.drawCard());
 			getPlayerHand(pid).add(deck.drawCard());
 			JLabel message = new JLabel(pid +"drew 2 cards");
 		}
 		if(card.getValue() == UnoCard.Value.Wild_four){
-			pid = playerIds[currentPlayer];
+			pid = playerIds.get(currentPlayer);
 			getPlayerHand(pid).add(deck.drawCard());
 			getPlayerHand(pid).add(deck.drawCard());
 			getPlayerHand(pid).add(deck.drawCard());
@@ -226,17 +228,17 @@ public class Game {
 		}
 		
 		if(card.getValue()== UnoCard.Value.Skip) {
-			JLabel message = new JLabel(playerIds[currentPlayer]+"was skipped!");
+			JLabel message = new JLabel(playerIds.get(currentPlayer)+"was skipped!");
 			message.setFont(new Font("Arial", Font.BOLD, 48));
 			JOptionPane.showMessageDialog(null, message);
 			if(gameDirection == false) {
-				currentPlayer = (currentPlayer +1) % playerIds.length;
+				currentPlayer = (currentPlayer +1) % playerIds.size();
 				
 			}
 			else if(gameDirection == true) {
-				currentPlayer = (currentPlayer -1) % playerIds.length;
+				currentPlayer = (currentPlayer -1) % playerIds.size();
 				if(currentPlayer == -1) {
-					currentPlayer = playerIds.length -1;
+					currentPlayer = playerIds.size() -1;
 				}
 			}
 		}
@@ -247,16 +249,16 @@ public class Game {
 		
 		gameDirection ^= true;
 		if(gameDirection == true) {
-			currentPlayer = (currentPlayer -2) % playerIds.length;
+			currentPlayer = (currentPlayer -2) % playerIds.size();
 			if (currentPlayer == -1) {
-				currentPlayer = playerIds.length -1;
+				currentPlayer = playerIds.size() -1;
 			}
 			if (currentPlayer == -2) {
-				currentPlayer = playerIds.length -2;
+				currentPlayer = playerIds.size() -2;
 			}
 		}
 		else if (gameDirection == false) {
-			currentPlayer =(currentPlayer +2) % playerIds.length;
+			currentPlayer =(currentPlayer +2) % playerIds.size();
 		}
 	  }
 	
