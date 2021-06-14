@@ -11,7 +11,7 @@ import javax.swing.JOptionPane;
 
 public class Game {
 	private int currentPlayer;
-	public static ArrayList<String> playerIds;
+	public static ArrayList<String> playerIds = new ArrayList<>();
 	
 	private UnoDeck deck;
 	private ArrayList<ArrayList<UnoCard>> playerHand;
